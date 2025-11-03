@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Video Editor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background: #f9f9f9;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+        nav {
+            background: #eee;
+            padding: 10px;
+        }
+        progress {
+            width: 100%;
+        }
+        .module {
+            display: none;
+            padding: 20px;
+        }
+        .module.active {
+            display: block;
+        }
+        button {
+            margin-top: 10px;
+            padding: 8px 16px;
+        }
+        input[type="file"] {
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Simple Video Editor</h1>
+    </header>
+    <nav>
+        <progress id="progress" value="1" max="8"></progress>
+    </nav>
+    <!-- Module 1: Import Media -->
+    <div id="module1" class="module active">
+        <h2>1. Import Media</h2>
+        <input type="file" id="mediaFiles" multiple accept="video/*,audio/*,image/*">
+        <button onclick="nextModule()">Next</button>
+    </div>
+    <!-- Module 2: Timeline Editor -->
+    <div id="module2" class="module">
+        <h2>2. Timeline Editor</h2>
+        <p>Arrange your clips here (placeholder).</p>
+        <button onclick="nextModule()">Next</button>
+    </div>
+    <!-- Module 3: Color Filters -->
+    <div id="module3" class="module">
+        <h2>3. Color Filters</h2>
+        <p>Select a filter: (placeholder).</p>
+        <button onclick="nextModule()">Next</button>
+    </div>
+    <!-- Module 4: Voiceover Upload -->
+    <div id="module4" class="module">
+        <h2>4. Voiceover Upload</h2>
+        <input type="file" id="voiceover" accept="audio/*">
+        <button onclick="nextModule()">Next</button>
+    </div>
+    <!-- Module 5: Background Music -->
+    <div id="module5" class="module">
+        <h2>5. Background Music</h2>
+        <input type="file" id="music" accept="audio/*">
+        <button onclick="nextModule()">Next</button>
+    </div>
+    <!-- Module 6: Text Captions -->
+    <div id="module6" class="module">
+        <h2>6. Text Captions</h2>
+        <textarea id="captions" rows="5" cols="40" placeholder="Enter captions with timestamps...\nExample: 00:00:01 --> 00:00:05\nThis is the first caption."></textarea>
+        <button onclick="nextModule()">Next</button>
+    </div>
+    <!-- Module 7: Sound Effects -->
+    <div id="module7" class="module">
+        <h2>7. Sound Effects</h2>
+        <input type="file" id="effects" multiple accept="audio/*">
+        <button onclick="nextModule()">Next</button>
+    </div>
+    <!-- Module 8: Export -->
+    <div id="module8" class="module">
+        <h2>8. Export</h2>
+        <button onclick="exportJSON()">Export Project JSON</button>
+        <button onclick="exportSRT()">Export Captions (SRT)</button>
+        <button onclick="exportZIP()">Export ZIP Bundle</button>
+        <p>Note: Rendering is not included. Use exported files for cloud rendering.</p>
+    </div>
+    <script>
+        let currentModule = 1;
+
+        function showModule(n) {
+            document.querySelectorAll('.module').forEach(div => div.classList.remove('active'));
+            const moduleEl = document.getElementById('module' + n);
+            if (moduleEl) {
+                moduleEl.classList.add('active');
+                document.getElementById('progress').value = n;
+                currentModule = n;
+            }
+        }
+
+        function nextModule() {
+            const next = currentModule + 1;
+            if (next <= 8) {
+                showModule(next);
+            }
+        }
+
+        function collectProjectData() {
+            // In a real app you'd collect data from each module
+            // Here we just build a simple object with placeholders
+            return {
+                mediaFiles: [],
+                timeline: [],
+                filters: {},
+                voiceover: document.getElementById('voiceover').files[0]?.name || null,
+                music: document.getElementById('music').files[0]?.name || null,
+                captions: document.getElementById('captions').value,
+                effects: []
+            };
+        }
+
+        function exportJSON() {
+            const data = collectProjectData();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'project.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportSRT() {
+            const captions = document.getElementById('captions').value;
+            const blob = new Blob([captions], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'captions.srt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportZIP() {
+            // Provide a minimal zip using JSZip if available; fallback to multiple downloads
+            alert('Zip export placeholder: download JSON and SRT separately.');
+            exportJSON();
+            exportSRT();
+        }
+
+        // Initialize first module
+        showModule(1);
+    </script>
+</body>
+</html>
